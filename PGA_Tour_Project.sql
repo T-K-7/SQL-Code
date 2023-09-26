@@ -1,5 +1,7 @@
----Questions 2018-2022 
+---Questions 2018-2022 PGA Tour
+
 --Delete duplicate rows
+
 WITH delete_dupes AS (
 	select 
 		player,
@@ -11,7 +13,8 @@ WITH delete_dupes AS (
 DELETE FROM delete_dupes 
 WHERE RN = 2;
 
---Seperate course from city & state**
+--Seperate course from city & state
+
 select
 	CASE WHEN CHARINDEX('-',course)>0 THEN
 		SUBSTRING(course, 1, CHARINDEX('-', course)-1)
@@ -42,7 +45,8 @@ SET City_Name =  CASE WHEN CHARINDEX('-',course)>0 THEN
 					SUBSTRING(course, CHARINDEX('-', course)+2, ((CHARINDEX(',', course)-2)-CHARINDEX('-', course)))
 					ELSE SUBSTRING(course, CHARINDEX(',', course)+2, CHARINDEX(',', course, CHARINDEX(',', course)+1)-CHARINDEX(',', course)-2) END
 
---Create Territory column (need to fix further for row 48 ex)
+--Create Territory column
+	
 select
 	CASE WHEN CHARINDEX('-',course)>0 THEN
 		SUBSTRING(course, CHARINDEX(',', course)+2, LEN(course))
@@ -105,6 +109,7 @@ where Finish <> 0
 group by Age_Category, season;
 
 --How many unique winners, each year?
+
 WITH unique_wins AS (
 select distinct player,
 	season
@@ -119,6 +124,7 @@ from unique_wins
 group by season;
 
 --Which player had the most Top 10s, each year (Do a rank and take 1,2,3 from each year)?
+
 WITH top10s AS (
 select 
 	player,
@@ -138,7 +144,9 @@ order by Top10s DESC;
 
 
 --Drive for show or Putt for dough?
+
 --Drive
+
 WITH Drive AS(
 select 
 	player,
@@ -151,7 +159,8 @@ group by player, Finish
 ),
 
 Drive_Rank AS (
-select player,
+select 
+	player,
 	Avg_Ott,
 	RANK()OVER(ORDER BY Avg_Ott DESC) AS OTT_Rank,
 	Distance,
@@ -162,7 +171,8 @@ select player,
 from Drive),
 
 Wins AS(
-select player,
+select 
+	player,
 	Avg_Ott,
 	OTT_Rank,
 	Distance,
@@ -178,7 +188,8 @@ where Winner = 'Winner'
 
 --Putt
 WITH Putt AS(
-select player,
+select 
+	player,
 	AVG(Finish) AS Avg_Finish,
 	AVG(sg_putt) AS Avg_putt,
 	AVG(PUTTS_HOLE) AS Avg_putt_hole,
@@ -187,7 +198,8 @@ from Golf_Project.dbo.GolfData
 group by player, Finish
 ),
 Putt_Rank AS (
-select player,
+select 
+	player,
 	Avg_putt,
 	RANK()OVER(ORDER BY Avg_putt DESC) AS Putt_Rank,
 	Avg_putt_hole,
@@ -198,7 +210,8 @@ select player,
 from Putt),
 
 Wins2 AS(
-select player,
+select 
+	player,
 	Avg_putt,
 	Putt_Rank,
 	Avg_putt_hole,
@@ -213,8 +226,10 @@ from Wins2
 where Winner = 'Winner'
 
 --Who performs the best in heat and cold?
+	
 WITH temp AS(
-select player,
+select 
+	player,
 	date,
 	season,
 	finish,
@@ -232,7 +247,8 @@ group by Temp_Cat;
 
 
 WITH temp2 AS(
-select player,
+select 
+	player,
 	date,
 	season,
 	finish,
@@ -242,7 +258,8 @@ select player,
 	ELSE 'Normal' END AS Temp_Cat
 from Golf_Project.dbo.GolfData)
 
-select player,
+select 
+	player,
 	AVG(finish) as Avg_Finish,
 	AVG(tempC) as Avg_Temp,
 	COUNT(*) as Num_Tournaments
@@ -253,7 +270,8 @@ order by Avg_Finish;
 
 
 WITH temp3 AS(
-select player,
+select 
+	player,
 	date,
 	season,
 	finish,
@@ -263,7 +281,8 @@ select player,
 	ELSE 'Normal' END AS Temp_Cat
 from Golf_Project.dbo.GolfData)
 
-select player,
+select 
+	player,
 	AVG(finish) as Avg_Finish,
 	AVG(tempC) as Avg_Temp,
 	COUNT(*) as Num_Tournaments
@@ -273,8 +292,9 @@ group by player
 order by Avg_Finish;
 
 --Who is the king of CA?
+
 WITH state_abv AS(
-Select
+select
 	player,
 	finish,
 	season,
@@ -298,13 +318,16 @@ select distinct player,
 from Golf_Project.dbo.GolfData),
 
 height_rank AS (
-select player,
+select 
+	player,
 	Height_cm,
 	RANK()OVER(ORDER BY Height_cm DESC) AS Height_Order
 from height)
 
 --Tallest
-select player, Height_cm
+select 
+	player, 
+	Height_cm
 from height_rank
 where Height_Order = 1
 
@@ -315,16 +338,20 @@ select distinct player,
 from Golf_Project.dbo.GolfData),
 
 height_rank2 AS (
-select player,
+select 
+	player,
 	Height_cm,
 	RANK()OVER(ORDER BY Height_cm) AS Height_Order
 from height2)
 
-select player, Height_cm
+select 
+	player, 
+	Height_cm
 from height_rank2
 where Height_Order = 1
 
 --Average
-Select
+	
+select
 	AVG(Height_cm)
 from Golf_Project.dbo.GolfData
